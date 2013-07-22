@@ -13,7 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-    include_once '/data/project/intersect-contribs/public_html/pietrodnUtils.php';
+    include_once 'pietrodnUtils.php';
+    include_once 'SectionLinkList.php';
+    include_once 'SectionStore.php';
 ?>
 <!DOCTYPE html>
 <html>
@@ -52,8 +54,12 @@ foreach($directions as $i=>$label)
 {
     $selected='';
     if($_GET['wikiDirection']==$i)
-        $selected='checked="checked" ';
-    echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
+        $selected='checked ';
+        
+    // Disabling "to" option (MediaWiki bug!)
+    if($i=='to')
+        $disabled='disabled ';
+    echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected $disabled/> $label<br />";
 }
 ?>
 </div>
@@ -67,73 +73,6 @@ foreach($directions as $i=>$label)
     define('MAX_API_CALLS', 20);
     $apiCalls = 0;
     
-    class SectionLinkList
-    {
-        private $arr = Array();
-        public $wikiHost = '';
-        
-        const NOPAGE_LINK = 1;
-        const ANCHOR_LINK = 2;
-        
-        function __construct($wh)
-        {
-            $this->wikiHost = $wh;
-        }
-        
-        function add($from, $to, $section, $flags=0)
-        {
-            $hash = md5($from . $to . $section);
-            if(array_key_exists($hash, $this->arr))
-            {
-                $this->arr[$hash]['count'] += 1;
-            } else {
-                $this->arr[$hash]['from'] = str_replace('_', ' ', rawurldecode($from));
-                $this->arr[$hash]['to'] = str_replace('_', ' ', rawurldecode($to));
-                $this->arr[$hash]['section'] = str_replace('_', ' ', rawurldecode($section));
-                $this->arr[$hash]['flags'] = $flags;
-                $this->arr[$hash]['count'] = 1;
-            }
-        }
-        
-        function printList()
-        {
-            if(count($this->arr)==0)
-            {
-                echo "<p>No results.</p>";
-            } else {
-                echo '<ul>';
-                foreach($this->arr as $hash=>$row)
-                {
-                    $linkUrl = rawurlencode(str_replace(' ', '_', $row['to'] . '#' . $row['section']));
-                    $fromUrl = rawurlencode(str_replace(' ', '_', $row['from']));
-                    $from = htmlspecialchars($row['from'], ENT_NOQUOTES);
-                    $to = htmlspecialchars($row['to'], ENT_NOQUOTES);
-                    $sect = htmlspecialchars($row['section'], ENT_NOQUOTES);
-                    $nopage = $anchor = $samepage = $doublespace = '';
-                    if(($row['flags'] & self::NOPAGE_LINK) == self::NOPAGE_LINK)
-                    {
-                        $nopage = ' nopage';
-                    }
-                    if(($row['flags'] & self::ANCHOR_LINK) == self::ANCHOR_LINK)
-                    {
-                        $anchor = ' (Warning: there is an anchor with this name!)';
-                    }
-                    if($from == $to)
-                    {
-                        $samepage = ' samepage';
-                    }
-                    if(strpos($row['section'], '  ') !== FALSE)
-                    {
-                        $doublespace = ' (Warning: double space in section link!)';
-                    }
-                    $count = $row['count'];
-                    $wh = $this->wikiHost;
-                    echo "<li><a href=\"http://$wh/w/index.php?title=$fromUrl\">$from</a> → <a href=\"http://$wh/w/index.php?title=$linkUrl\"><span class=\"$nopage$samepage\">$to</span><span class=\"canc\">#</span>$sect</a> ($count)$anchor$doublespace</li>";
-                }
-                echo '</ul>';
-            }
-        }
-    };
     $wikiDb = addslashes($_GET['wikiDb']); // A little more security
     
     if(!$_GET['wikiDb'] and !$_GET['wikiDirection'] and !$_GET['wikiPage'])
@@ -148,6 +87,8 @@ foreach($directions as $i=>$label)
     {
         $wikiHost = getWikiHost($wikiDb);
         
+        $ss = new SectionStore($wikiHost);
+        
         $pageForUrl = rawurlencode($_GET['wikiPage']);
         $pageText = getPageText($_GET['wikiPage'], FALSE);
         if($pageText=='')
@@ -161,24 +102,19 @@ foreach($directions as $i=>$label)
             {
                 $linkedPage = $linkedMatch[1];
                 $linkedSect = str_replace('_', ' ', rawurldecode($linkedMatch[2]));
-                if($linkedPage == '' || $linkedPage == $_GET['wikiPage'])
+                if($linkedPage == '')
                 {
                     $linkedPage = $_GET['wikiPage'];
-                    $linkedText = $pageText;
-                } else {
-                    $linkedText = getPageText($linkedPage);
                 }
                 
                 $flags = 0;
-                if($linkedText == '')
-                    $flags |= SectionLinkList::NOPAGE_LINK;
-                    
-                if(!hasSection($linkedSect, $linkedText) || $_GET['wikiPage'] == $linkedPage)
+                
+                if(!$ss->hasSection($linkedSect, $linkedPage))
                 {
-                    if(hasAnchor($linkedSect, $linkedText))
+                    /*if(hasAnchor($linkedSect, $linkedText))
                     {
                         $flags |= SectionLinkList::ANCHOR_LINK;
-                    }
+                    }*/
                     $linkList->add($_GET['wikiPage'], $linkedPage, $linkedSect, $flags);
                 }
             }
@@ -187,6 +123,9 @@ foreach($directions as $i=>$label)
             // Links pointing to the specified page
             echo "Links to inexistent sections pointing to the specified <a href=\"http://$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"http://$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
             echo '<ul>';
+            
+            // Sections of specified page
+            $mySections = $ss->getSections($_GET['wikiPage']);
             
             // Get references
             $references = getReferences($_GET['wikiPage']);
@@ -202,16 +141,20 @@ foreach($directions as $i=>$label)
                     ($refPage == $_GET['wikiPage'] ? '?' : '') . // Destination page can be omitted only if source = dest.
                     '#([^\]|]+)(\|[^\]]+)?\]\]/',
                     $refText, $refMatches, PREG_SET_ORDER);  
+                //var_dump($refMatches);
                 foreach($refMatches as $refMatch)
                 {
+                	
                     $flags = 0;
                     $refSect = str_replace('_', ' ', rawurldecode($refMatch[2]));
-                    if(!hasSection($refSect, $pageText) || $_GET['wikiPage'] == $refPage)
+                    echo $refSect;
+                    if(!in_array($refSect, $mySections) || $_GET['wikiPage'] == $refPage)
                     {
+                    	/*
                         if(hasAnchor($refSect, $pageText))
                         {
                             $flags |= SectionLinkList::ANCHOR_LINK;
-                        }
+                        }*/
                         $refList->add($refPage, $_GET['wikiPage'], $refSect, $flags);
                     }
                 }
@@ -230,17 +173,23 @@ foreach($directions as $i=>$label)
         }
         
         $pageForUrl = rawurlencode($page);
-        $req = curl_init("http://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&redirects&format=php");
+        $url = "http://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&redirects&format=php";
+        $req = curl_init($url);
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
         $unser = unserialize($ser);
         $references = $unser['query']['pages'];
+        //echo $url . "\n\n";
         // Recursive function for query-continue
-        if(array_key_exists('query-continue', $unser))
+        if(isset($unser['query-continue']))
         {
             $qc = '&gblcontinue=' . $unser['query-continue']['backlinks']['gblcontinue'];
+            //echo $qc . "\n";
+            //echo $url . "\n";
             return array_merge($references, getReferences($page, $qc));
         } else {
+        	
+        	//var_dump($unser);
             return $references;
         }
     }
@@ -309,7 +258,7 @@ foreach($directions as $i=>$label)
 		<div class='pBody'>
 			<ul>
 				<li id="n-pietrodn"><a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietrodn</a></li>
-				<li id="n-svn"><a href="//github.com/pietrodn/intersect-contribs">Git repository</a></li>
+				<li id="n-svn"><a href="//github.com/pietrodn/section-links">Git repository</a></li>
 			</ul>
 		</div>
 	</div>
@@ -320,6 +269,7 @@ foreach($directions as $i=>$label)
 		<div class='pBody'>
 			<ul>
 				<li id="t-intersectcontribs"><a href="/intersect-contribs">Intersect Contribs</a></li>
+				<li id="t-sectionlinks"><a href="/section-links">Section Links</a></li>
 			</ul>
 		</div>
 	</div>
