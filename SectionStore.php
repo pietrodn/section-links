@@ -26,7 +26,7 @@ class SectionStore
 	{
 		/* Calls MW API */
 		$pageForUrl = rawurlencode($page);
-        $req = curl_init("http://" . $this->wikiHost . "/w/api.php?action=parse&prop=sections&page=$pageForUrl&format=php");
+        $req = curl_init("https://" . $this->wikiHost . "/w/api.php?action=parse&prop=sections&page=$pageForUrl&format=php");
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
         $unser = unserialize($ser);

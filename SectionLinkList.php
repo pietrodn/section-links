@@ -60,7 +60,7 @@ class SectionLinkList
 				}
 				$count = $row['count'];
 				$wh = $this->wikiHost;
-				echo "<li><a href=\"http://$wh/w/index.php?title=$fromUrl\">$from</a> → <a href=\"http://$wh/w/index.php?title=$linkUrl\"><span class=\"$nopage$samepage\">$to</span><span class=\"canc\">#</span>$sect</a> ($count)$anchor$doublespace</li>";
+				echo "<li><a href=\"//$wh/w/index.php?title=$fromUrl\">$from</a> → <a href=\"//$wh/w/index.php?title=$linkUrl\"><span class=\"$nopage$samepage\">$to</span><span class=\"canc\">#</span>$sect</a> ($count)$anchor$doublespace</li>";
 			}
 			echo '</ul>';
 		}

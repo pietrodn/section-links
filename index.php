@@ -31,7 +31,7 @@
 	<div id="globalWrapper">
 		<div id="column-content">
 	<div id="content">
-		<a name="top" id="top"></a>
+		<a id="top"></a>
 		<h1 class="firstHeading">Section Links</h1>
 
 		<div id="bodyContent">
@@ -41,7 +41,7 @@
 
 <form id="ListaForm" action="<? echo $_SERVER['PHP_SELF']; ?>" method="get">
 <fieldset>
-<label id="wikiDb">Choose your project:
+<label id="wikiDb">Project:
 <select name="wikiDb">
 <?php
     projectChooser($_GET['wikiDb']); // $allWikis passed by reference!
@@ -53,7 +53,7 @@ $directions = Array('from'=>'From: ', 'to'=>'To: ');
 foreach($directions as $i=>$label)
 {
     $selected='';
-    if($_GET['wikiDirection']==$i)
+    if($_GET['wikiDirection']==$i || $i == 'from')
         $selected='checked ';
         
     // Disabling "to" option (MediaWiki bug!)
@@ -65,8 +65,8 @@ foreach($directions as $i=>$label)
 </div>
 <input type="text" size="20" name="wikiPage" value="<? print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
 <br style="clear:both;" />
-<input type="submit" value="Show" />
 </fieldset>
+<input id="SubmitButton" type="submit" value="Show" />
 </form>
 
 <?php
@@ -95,7 +95,7 @@ foreach($directions as $i=>$label)
         {
             printError("The page that you entered doesn't exist in this wiki.");
         } else if($_GET['wikiDirection'] == 'from') {
-            echo "Links to inexistent sections in the specified <a href=\"http://$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"http://$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
+            echo "Links to inexistent sections in the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
             $linkList = new SectionLinkList($wikiHost);
             preg_match_all('/\[\[([^\]|]*)#([^\]|]+)(\|[^\]]+)?\]\]/', $pageText, $linkedMatches, PREG_SET_ORDER);
             foreach($linkedMatches as $linkedMatch)
@@ -121,7 +121,7 @@ foreach($directions as $i=>$label)
             $linkList->printList();
         } else if($_GET['wikiDirection'] == 'to') {
             // Links pointing to the specified page
-            echo "Links to inexistent sections pointing to the specified <a href=\"http://$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"http://$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
+            echo "Links to inexistent sections pointing to the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
             echo '<ul>';
             
             // Sections of specified page
@@ -173,7 +173,7 @@ foreach($directions as $i=>$label)
         }
         
         $pageForUrl = rawurlencode($page);
-        $url = "http://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&redirects&format=php";
+        $url = "https://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&redirects&format=php";
         $req = curl_init($url);
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
@@ -222,7 +222,7 @@ foreach($directions as $i=>$label)
         if($followRedirects)
             $redirects='&redirects'; 
         $pageForUrl = rawurlencode($page);
-        $req = curl_init("http://$wikiHost/w/api.php?action=query&prop=revisions&titles=$pageForUrl&rvprop=content$redirects&format=php");
+        $req = curl_init("https://$wikiHost/w/api.php?action=query&prop=revisions&titles=$pageForUrl&rvprop=content$redirects&format=php");
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
         $unser = unserialize($ser);
@@ -244,14 +244,13 @@ foreach($directions as $i=>$label)
 			<ul>
 	
 				 <li id="ca-nstab-project" class="selected"><a href="<? echo $_SERVER['PHP_SELF']; ?>" title="The tool [t]" accesskey="t">tool</a></li>
-				<!--
-				 <li id="ca-source"><a href="https://fisheye.toolserver.org/browse/pietrodn/php/" title="See the source code of this tool [s]" accesskey="s">source</a></li>
-				 --></ul>
+				 <li id="ca-source"><a href="//github.com/pietrodn/section-links" title="See the source code of this tool [s]" accesskey="s">source</a></li>
+			</ul>
 		</div>
 	</div>
 
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(//wikitech.wikimedia.org/w/images/thumb/6/60/Wikimedia_labs_logo.svg/120px-Wikimedia_labs_logo.svg.png);" href="https://wikitech.wikimedia.org" title="Wikimedia Tool Labs" accesskey="w"></a>
+		<a style="background-image: url(//wikitech.wikimedia.org/w/images/thumb/6/60/Wikimedia_labs_logo.svg/120px-Wikimedia_labs_logo.svg.png);" href="//wikitech.wikimedia.org" title="Wikimedia Tool Labs" accesskey="w"></a>
 	</div>
 		<div class='generated-sidebar portlet' id='p-navigation'>
 		<h3>Navigation</h3>
@@ -279,7 +278,7 @@ foreach($directions as $i=>$label)
 			<div id="footer">
 			<div id="f-copyrightico">
 <!-- Creative Commons License -->
-<a href="http://creativecommons.org/licenses/GPL/2.0/">
+<a href="//www.gnu.org/licenses/gpl.html">
 <img alt="CC-GNU GPL 2.0" src="images/cc-GPL-a.png" height="50" /></a>
 <!-- /Creative Commons License -->
 </div>

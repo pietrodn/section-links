@@ -55,6 +55,6 @@ input#SubmitButton {
 	width: 100px;
 }
 
-#PageList {
-	margin-top: 20px;
+form {
+	margin-bottom: 20px;
 }
