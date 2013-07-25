@@ -15,8 +15,7 @@ class SectionLinkList
 	function add($from, $to, $section, $flags=0)
 	{
 		$hash = md5($from . $to . $section);
-		if(array_key_exists($hash, $this->arr))
-		{
+		if(array_key_exists($hash, $this->arr)) {
 			$this->arr[$hash]['count'] += 1;
 		} else {
 			$this->arr[$hash]['from'] = str_replace('_', ' ', rawurldecode($from));
@@ -29,33 +28,27 @@ class SectionLinkList
 	
 	function printList()
 	{
-		if(count($this->arr)==0)
-		{
+		if(count($this->arr)==0) {
 			echo "<p>No results.</p>";
 		} else {
 			echo '<ol>';
-			foreach($this->arr as $hash=>$row)
-			{
+			foreach($this->arr as $hash=>$row) {
 				$linkUrl = rawurlencode(str_replace(' ', '_', $row['to'] . '#' . $row['section']));
 				$fromUrl = rawurlencode(str_replace(' ', '_', $row['from']));
 				$from = htmlspecialchars($row['from'], ENT_NOQUOTES);
 				$to = htmlspecialchars($row['to'], ENT_NOQUOTES);
 				$sect = htmlspecialchars($row['section'], ENT_NOQUOTES);
 				$nopage = $anchor = $samepage = $doublespace = '';
-				if(($row['flags'] & self::NOPAGE_LINK) == self::NOPAGE_LINK)
-				{
+				if(($row['flags'] & self::NOPAGE_LINK) == self::NOPAGE_LINK) {
 					$nopage = ' nopage';
 				}
-				if(($row['flags'] & self::ANCHOR_LINK) == self::ANCHOR_LINK)
-				{
+				if(($row['flags'] & self::ANCHOR_LINK) == self::ANCHOR_LINK) {
 					$anchor = ' (Warning: there is an anchor with this name!)';
 				}
-				if($from == $to)
-				{
+				if($from == $to) {
 					$samepage = ' samepage';
 				}
-				if(strpos($row['section'], '  ') !== FALSE)
-				{
+				if(strpos($row['section'], '  ') !== FALSE) {
 					$doublespace = ' (Warning: double space in section link!)';
 				}
 				$count = $row['count'];

@@ -4,11 +4,16 @@ class SectionStore
 	private $arr = Array();
 	public $wikiHost = '';
 	
+	const SECTION_YES = 1;
+	const SECTION_NO = 2;
+	const RED_LINK = 3;
+	
 	public function __construct($wh)
 	{
 		$this->wikiHost = $wh;
 	}
 	
+	/* Returns an array of sections, or false if the page doesn't exists. */
 	public function getSections($page)
 	{
 		if(!isset($this->arr[$page])) {
@@ -19,7 +24,13 @@ class SectionStore
 	
 	public function hasSection($section, $page)
 	{
-		return in_array($section, $this->getSections($page));
+		$sects = $this->getSections($page);
+		if($sects === FALSE)
+			return self::RED_LINK;
+		if(in_array($section, $sects))
+			return self::SECTION_YES;
+		else
+			return self::SECTION_NO;
 	}
 	
 	private function addPage($page)
@@ -30,6 +41,10 @@ class SectionStore
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
         $unser = unserialize($ser);
+		
+		if(isset($unser['error']) && $unser['error']['code'] == 'missingtitle') {
+			$this->arr[$page] = FALSE;
+		}
 		
 		$sections = $unser['parse']['sections'];
 		//var_dump($sections);

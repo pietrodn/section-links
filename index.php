@@ -39,6 +39,14 @@
 			<h3 id="siteSub">Wikimedia Tool Labs - Pietrodn's tools.</h3>
 			<!-- start content -->
 			<p>This tool shows inexistent section links from or to a page.</p>
+			<p>Known issues:
+			<ul>
+				<li>Highly experimental and not fully developed tool.</li>
+				<li>The tool uses the MediaWiki Web API and not the replicated databases in order to get revision full texts.</li>
+				<li><em>To</em> option is quite slow and expensive: it needs to retrieve the text of every reference to the given page (it frequently hits the API call limit).</li>
+				<li>Redirect handling is inconsistent.</li>
+			</ul>
+			</p>
 
 <form id="ListaForm" action="<? echo $_SERVER['PHP_SELF']; ?>" method="get">
 <fieldset>
@@ -97,7 +105,7 @@ foreach($directions as $i=>$label)
         
         $pageForUrl = rawurlencode($_GET['wikiPage']);
         $pageText = getPageText($_GET['wikiPage'], FALSE);
-        if($pageText=='')
+        if($pageText===FALSE)
             throw new Exception("The page that you entered doesn't exist in this wiki.");
             
     	if($_GET['wikiDirection'] == 'from') {
@@ -115,10 +123,12 @@ foreach($directions as $i=>$label)
                 
                 $flags = 0;
                 
-                if(!$ss->hasSection($linkedSect, $linkedPage))
+                $result = $ss->hasSection($linkedSect, $linkedPage);
+                if($result != SectionStore::SECTION_YES)
                 {
-                    if($linkedPage == $_GET['wikiPage'] && hasAnchor($linkedSect, $pageText))
-                    {
+                	if($result == SectionStore::RED_LINK) {
+                		$flags |= SectionLinkList::NOPAGE_LINK;
+                    } else if($linkedPage == $_GET['wikiPage'] && hasAnchor($linkedSect, $pageText)) {
                         $flags |= SectionLinkList::ANCHOR_LINK;
                     }
                     $list->add($_GET['wikiPage'], $linkedPage, $linkedSect, $flags);
@@ -159,11 +169,10 @@ foreach($directions as $i=>$label)
                         {
                             $flags |= SectionLinkList::ANCHOR_LINK;
                         }
-                        $refList->add($refPage, $_GET['wikiPage'], $refSect, $flags);
+                        $list->add($refPage, $_GET['wikiPage'], $refSect, $flags);
                     }
                 }
             }
-            $list->printList();
         }
         
         $list->printList();
@@ -176,8 +185,6 @@ foreach($directions as $i=>$label)
     		$list->printList();
     	}
     }
-    
-    
     
     function getReferences($page, $queryContinue='')
     {
@@ -235,6 +242,9 @@ foreach($directions as $i=>$label)
         $ser = curl_exec($req);
         $unser = unserialize($ser);
         $singlePage = array_shift($unser['query']['pages']);
+        if(isset($singlePage['missing'])) {
+        	return FALSE;
+        }
         $pageText = $singlePage['revisions'][0]['*'];
         $textCache[$page] = $pageText;
         return $pageText;
