@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+	
     include_once 'pietrodnUtils.php';
     include_once 'SectionLinkList.php';
     include_once 'SectionStore.php';
@@ -37,14 +38,14 @@
 		<div id="bodyContent">
 			<h3 id="siteSub">Wikimedia Tool Labs - Pietrodn's tools.</h3>
 			<!-- start content -->
-			<p>This tool shows inexistent section links from or to a page. It follows redirects, but if the starting page is a redirect the tool doesn't follow it.</p>
+			<p>This tool shows inexistent section links from or to a page.</p>
 
 <form id="ListaForm" action="<? echo $_SERVER['PHP_SELF']; ?>" method="get">
 <fieldset>
 <label id="wikiDb">Project:
 <select name="wikiDb">
 <?php
-    projectChooser($_GET['wikiDb']); // $allWikis passed by reference!
+    projectChooser2($_GET['wikiDb']); // $allWikis passed by reference!
 ?>
 </select></label>
 <div style="float:left; margin-right:5px;">
@@ -53,13 +54,10 @@ $directions = Array('from'=>'From: ', 'to'=>'To: ');
 foreach($directions as $i=>$label)
 {
     $selected='';
-    if($_GET['wikiDirection']==$i || $i == 'from')
+    if($_GET['wikiDirection']==$i)
         $selected='checked ';
-        
-    // Disabling "to" option (MediaWiki bug!)
-    if($i=='to')
-        $disabled='disabled ';
-    echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected $disabled/> $label<br />";
+    
+    echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
 }
 ?>
 </div>
@@ -70,33 +68,41 @@ foreach($directions as $i=>$label)
 </form>
 
 <?php
-    define('MAX_API_CALLS', 20);
+    define('MAX_API_CALLS', 40);
+    define('ALL_PARAMS_MISSING_EXC', 1);
+    define('SOME_PARAMS_MISSING_EXC', 2);
+    define('NONEXISTENT_WIKI_EXC', 3);
+    define('DIRECTION_EXC', 4);
+    define('API_EXC', 5);
+    
     $apiCalls = 0;
     
     $wikiDb = addslashes($_GET['wikiDb']); // A little more security
     
-    if(!$_GET['wikiDb'] and !$_GET['wikiDirection'] and !$_GET['wikiPage'])
-        print "";
-    else if(!$_GET['wikiDb'] or !$_GET['wikiDirection'] or !$_GET['wikiPage'])
-        printError('Some parameters are missing.');
-    else if(!in_array($_GET['wikiDb'], $wikiProjects))
-        printError('You tried to select a non-existent wiki!');
-    else if(!in_array($_GET['wikiDirection'], array_keys($directions)))
-        printError('Error specifying the direction.');
-    else
-    {
+    try {
+    
+		if(!$_GET['wikiDb'] and !$_GET['wikiDirection'] and !$_GET['wikiPage'])
+			throw new Exception("", ALL_PARAMS_MISSING_EXC);
+		if(!$_GET['wikiDb'] or !$_GET['wikiDirection'] or !$_GET['wikiPage'])
+			throw new Exception('Some parameters are missing.', SOME_PARAMS_MISSING_EXC);
+		if(!in_array($_GET['wikiDb'], $wikiProjects))
+			throw new Exception('You tried to select a non-existent wiki!', NONEXISTENT_WIKI_EXC);
+		if(!in_array($_GET['wikiDirection'], array_keys($directions)))
+			throw new Exception('Error specifying the direction.', DIRECTION_EXC);
+
         $wikiHost = getWikiHost($wikiDb);
         
+        $list = new SectionLinkList($wikiHost);
         $ss = new SectionStore($wikiHost);
         
         $pageForUrl = rawurlencode($_GET['wikiPage']);
         $pageText = getPageText($_GET['wikiPage'], FALSE);
         if($pageText=='')
-        {
-            printError("The page that you entered doesn't exist in this wiki.");
-        } else if($_GET['wikiDirection'] == 'from') {
+            throw new Exception("The page that you entered doesn't exist in this wiki.");
+            
+    	if($_GET['wikiDirection'] == 'from') {
             echo "Links to inexistent sections in the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
-            $linkList = new SectionLinkList($wikiHost);
+            
             preg_match_all('/\[\[([^\]|]*)#([^\]|]+)(\|[^\]]+)?\]\]/', $pageText, $linkedMatches, PREG_SET_ORDER);
             foreach($linkedMatches as $linkedMatch)
             {
@@ -111,14 +117,14 @@ foreach($directions as $i=>$label)
                 
                 if(!$ss->hasSection($linkedSect, $linkedPage))
                 {
-                    /*if(hasAnchor($linkedSect, $linkedText))
+                    if($linkedPage == $_GET['wikiPage'] && hasAnchor($linkedSect, $pageText))
                     {
                         $flags |= SectionLinkList::ANCHOR_LINK;
-                    }*/
-                    $linkList->add($_GET['wikiPage'], $linkedPage, $linkedSect, $flags);
+                    }
+                    $list->add($_GET['wikiPage'], $linkedPage, $linkedSect, $flags);
                 }
             }
-            $linkList->printList();
+            
         } else if($_GET['wikiDirection'] == 'to') {
             // Links pointing to the specified page
             echo "Links to inexistent sections pointing to the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
@@ -130,8 +136,7 @@ foreach($directions as $i=>$label)
             // Get references
             $references = getReferences($_GET['wikiPage']);
             $references[] = array('title' => $_GET['wikiPage'], 'revisions' => array(0 => array('*' => $pageText))); // Adding the start page page as possible reference, as it's not included in backreferences.
-            //var_dump($references);
-            $refList = new SectionLinkList($wikiHost);
+			
             foreach($references as $row)
             {
                 $refPage = $row['title'];
@@ -141,55 +146,59 @@ foreach($directions as $i=>$label)
                     ($refPage == $_GET['wikiPage'] ? '?' : '') . // Destination page can be omitted only if source = dest.
                     '#([^\]|]+)(\|[^\]]+)?\]\]/',
                     $refText, $refMatches, PREG_SET_ORDER);  
-                //var_dump($refMatches);
+				
                 foreach($refMatches as $refMatch)
                 {
                 	
                     $flags = 0;
                     $refSect = str_replace('_', ' ', rawurldecode($refMatch[2]));
-                    echo $refSect;
+                    
                     if(!in_array($refSect, $mySections) || $_GET['wikiPage'] == $refPage)
                     {
-                    	/*
                         if(hasAnchor($refSect, $pageText))
                         {
                             $flags |= SectionLinkList::ANCHOR_LINK;
-                        }*/
+                        }
                         $refList->add($refPage, $_GET['wikiPage'], $refSect, $flags);
                     }
                 }
             }
-            $refList->printList();
+            $list->printList();
         }
+        
+        $list->printList();
+        
+    } catch (Exception $e) {
+    	if(!($e->getCode() == ALL_PARAMS_MISSING_EXC))
+    		printError($e->getMessage());
+    	if($e->getCode() == API_EXC) {
+    		printError("The following list is incomplete.");
+    		$list->printList();
+    	}
     }
+    
+    
     
     function getReferences($page, $queryContinue='')
     {
         global $wikiHost, $apiCalls;
         if(++$apiCalls > MAX_API_CALLS)
-        {
-            printError('Max. API call limit exceeded (' . MAX_API_CALLS . ')');
-            exit();
-        }
+            throw new Exception('Max. API call limit exceeded (' . MAX_API_CALLS . ')', API_EXC);
         
         $pageForUrl = rawurlencode($page);
-        $url = "https://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&redirects&format=php";
+        $url = "https://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&format=php";
         $req = curl_init($url);
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
         $unser = unserialize($ser);
         $references = $unser['query']['pages'];
-        //echo $url . "\n\n";
         // Recursive function for query-continue
         if(isset($unser['query-continue']))
         {
             $qc = '&gblcontinue=' . $unser['query-continue']['backlinks']['gblcontinue'];
-            //echo $qc . "\n";
-            //echo $url . "\n";
             return array_merge($references, getReferences($page, $qc));
         } else {
         	
-        	//var_dump($unser);
             return $references;
         }
     }
@@ -213,11 +222,10 @@ foreach($directions as $i=>$label)
         {
             return $textCache[$page];
         }
+        
         if(++$apiCalls > MAX_API_CALLS)
-        {
-            printError('Max. API call limit exceeded (' . MAX_API_CALLS . ')');
-            exit();
-        }
+            throw new Exception('Max. API call limit exceeded (' . MAX_API_CALLS . ')', API_EXC);
+            
         $redirects = '';
         if($followRedirects)
             $redirects='&redirects'; 

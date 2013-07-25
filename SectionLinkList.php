@@ -33,7 +33,7 @@ class SectionLinkList
 		{
 			echo "<p>No results.</p>";
 		} else {
-			echo '<ul>';
+			echo '<ol>';
 			foreach($this->arr as $hash=>$row)
 			{
 				$linkUrl = rawurlencode(str_replace(' ', '_', $row['to'] . '#' . $row['section']));
@@ -62,7 +62,7 @@ class SectionLinkList
 				$wh = $this->wikiHost;
 				echo "<li><a href=\"//$wh/w/index.php?title=$fromUrl\">$from</a> → <a href=\"//$wh/w/index.php?title=$linkUrl\"><span class=\"$nopage$samepage\">$to</span><span class=\"canc\">#</span>$sect</a> ($count)$anchor$doublespace</li>";
 			}
-			echo '</ul>';
+			echo '</ol>';
 		}
 	}
 };
