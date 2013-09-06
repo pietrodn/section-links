@@ -53,7 +53,8 @@
 <label id="wikiDb">Project:
 <select name="wikiDb">
 <?php
-    projectChooser2($_GET['wikiDb']); // $allWikis passed by reference!
+	$selectedProject = (isset($_GET['wikiDb']) ? $_GET['wikiDb'] : NULL);
+    projectChooser($selectedProject);
 ?>
 </select></label>
 <div style="float:left; margin-right:5px;">
@@ -62,14 +63,16 @@ $directions = Array('from'=>'From: ', 'to'=>'To: ');
 foreach($directions as $i=>$label)
 {
     $selected='';
-    if($_GET['wikiDirection']==$i)
+    if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i)
         $selected='checked ';
     
     echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
 }
 ?>
 </div>
-<input type="text" size="20" name="wikiPage" value="<? print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
+<input type="text" size="20" name="wikiPage" value="<? 
+if(isset($_GET['wikiPage']))
+	print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
 <br style="clear:both;" />
 </fieldset>
 <input id="SubmitButton" type="submit" value="Show" />
@@ -85,20 +88,16 @@ foreach($directions as $i=>$label)
     
     $apiCalls = 0;
     
-    $wikiDb = addslashes($_GET['wikiDb']); // A little more security
-    
     try {
     
-		if(!$_GET['wikiDb'] and !$_GET['wikiDirection'] and !$_GET['wikiPage'])
+		if(empty($_GET['wikiDb']) and empty($_GET['wikiDirection']) and empty($_GET['wikiPage']))
 			throw new Exception("", ALL_PARAMS_MISSING_EXC);
-		if(!$_GET['wikiDb'] or !$_GET['wikiDirection'] or !$_GET['wikiPage'])
+		if(empty($_GET['wikiDb']) or empty($_GET['wikiDirection']) or empty($_GET['wikiPage']))
 			throw new Exception('Some parameters are missing.', SOME_PARAMS_MISSING_EXC);
-		if(!in_array($_GET['wikiDb'], $wikiProjects))
+		if(!($wikiHost = getWikiHost($_GET['wikiDb'])))
 			throw new Exception('You tried to select a non-existent wiki!', NONEXISTENT_WIKI_EXC);
 		if(!in_array($_GET['wikiDirection'], array_keys($directions)))
 			throw new Exception('Error specifying the direction.', DIRECTION_EXC);
-
-        $wikiHost = getWikiHost($wikiDb);
         
         $list = new SectionLinkList($wikiHost);
         $ss = new SectionStore($wikiHost);
