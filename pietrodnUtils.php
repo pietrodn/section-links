@@ -1,12 +1,12 @@
 <?php
 
-// Username & password
-require_once("../external_includes/mysql_pw.inc");
+// Imports configuration
+require_once("config.php");
 
 // Returns the wiki host name (e.g. it.wikipedia.org), given the db name (e.g. itwiki).
 function getWikiHost($wikidb)
 {
-    $db = new mysqli('enwiki.labsdb', DB_USER, DB_PASSWORD, 'meta_p');
+    $db = new mysqli(META_HOST, DB_USER, DB_PASSWORD, META_DB);
     if ($db == FALSE) {
         return false;
     }
@@ -24,7 +24,7 @@ function getWikiHost($wikidb)
 // Prints a menu of WMF wikis.
 function projectChooser($defaultPj = NULL)
 {   
-    $db = new mysqli('enwiki.labsdb', DB_USER, DB_PASSWORD, 'meta_p');
+    $db = new mysqli(META_HOST, DB_USER, DB_PASSWORD, META_DB);
     if ($db == FALSE)
         die ("Can't log into MySQL.");
     

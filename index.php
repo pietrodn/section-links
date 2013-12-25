@@ -48,7 +48,7 @@
 			</ul>
 			</p>
 
-<form id="ListaForm" action="<? echo $_SERVER['PHP_SELF']; ?>" method="get">
+<form id="ListaForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
 <fieldset>
 <label id="wikiDb">Project:
 <select name="wikiDb">
@@ -70,7 +70,7 @@ foreach($directions as $i=>$label)
 }
 ?>
 </div>
-<input type="text" size="20" name="wikiPage" value="<? 
+<input type="text" size="20" name="wikiPage" value="<?php 
 if(isset($_GET['wikiPage']))
 	print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
 <br style="clear:both;" />
@@ -260,7 +260,7 @@ if(isset($_GET['wikiPage']))
 		<div class="pBody">
 			<ul>
 	
-				 <li id="ca-nstab-project" class="selected"><a href="<? echo $_SERVER['PHP_SELF']; ?>" title="The tool [t]" accesskey="t">tool</a></li>
+				 <li id="ca-nstab-project" class="selected"><a href="<?php echo $_SERVER['PHP_SELF']; ?>" title="The tool [t]" accesskey="t">tool</a></li>
 				 <li id="ca-source"><a href="//github.com/pietrodn/section-links" title="See the source code of this tool [s]" accesskey="s">source</a></li>
 			</ul>
 		</div>
