@@ -267,7 +267,7 @@ if(isset($_GET['wikiPage']))
 	</div>
 
 	<div class="portlet" id="p-logo">
-		<a style="background-image: url(//wikitech.wikimedia.org/w/images/thumb/6/60/Wikimedia_labs_logo.svg/120px-Wikimedia_labs_logo.svg.png);" href="//wikitech.wikimedia.org" title="Wikimedia Tool Labs" accesskey="w"></a>
+		<a style="background-image: url(images/WikitechLogo.png);" href="//wikitech.wikimedia.org" title="Wikimedia Tool Labs" accesskey="w"></a>
 	</div>
 		<div class='generated-sidebar portlet' id='p-navigation'>
 		<h3>Navigation</h3>
