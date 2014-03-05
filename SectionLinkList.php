@@ -26,16 +26,13 @@ class SectionLinkList
 		}
 	}
 	
+	function countList() {
+		return count($this->arr);
+	}
+	
 	function printList()
 	{
-		if(count($this->arr)==0) {
-			echo '<div class="alert alert-info">';
-			echo 'No results found.';
-			echo '</div>';
-		} else {
-			echo '<div class="alert alert-success">';
-			echo count($this->arr) . ' results found.';
-			echo '</div>';	
+		if(count($this->arr)!=0) {
 			echo '<ol>';
 			foreach($this->arr as $hash=>$row) {
 				$linkUrl = rawurlencode(str_replace(' ', '_', $row['to'] . '#' . $row['section']));

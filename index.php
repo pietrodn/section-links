@@ -68,7 +68,7 @@
 			</div>
 			<!-- start content -->
 			<p>This tool shows inexistent section links from or to a page.</p>
-			<p>Known issues</p>:
+			<p>Known issues:</p>
 			<ul>
 				<li>Highly experimental and not fully developed tool.</li>
 				<li>The tool uses the MediaWiki Web API and not the replicated databases in order to get revision full texts.</li>
@@ -140,9 +140,7 @@
         if($pageText===FALSE)
             throw new Exception("The page that you entered doesn't exist in this wiki.");
             
-    	if($_GET['wikiDirection'] == 'from') {
-            echo "Links to inexistent sections in the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
-            
+    	if($_GET['wikiDirection'] == 'from') {            
             preg_match_all('/\[\[([^\]|]*)#([^\]|]+)(\|[^\]]+)?\]\]/', $pageText, $linkedMatches, PREG_SET_ORDER);
             foreach($linkedMatches as $linkedMatch)
             {
@@ -169,7 +167,6 @@
             
         } else if($_GET['wikiDirection'] == 'to') {
             // Links pointing to the specified page
-            echo "Links to inexistent sections pointing to the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
             echo '<ul>';
             
             // Sections of specified page
@@ -207,7 +204,22 @@
             }
         }
         
-        $list->printList();
+        $count = $list->countList();
+        if($count === 0) {
+        	echo '<div class="alert alert-info">';
+			echo 'No results found.';
+			echo '</div>';
+        } else {
+        	echo '<div class="alert alert-success">';
+        	if($_GET['wikiDirection'] == 'from') {
+        		echo "Links to inexistent sections in the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
+        	} else if($_GET['wikiDirection'] == 'to') {
+        		echo "Links to inexistent sections pointing to the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
+        	}
+			echo $count . ' results found.';
+			echo '</div>';	
+        	$list->printList();
+        }
         
     } catch (Exception $e) {
     	if(!($e->getCode() == ALL_PARAMS_MISSING_EXC))
