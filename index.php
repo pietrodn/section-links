@@ -13,7 +13,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-	
     include_once 'pietrodnUtils.php';
     include_once 'SectionLinkList.php';
     include_once 'SectionStore.php';
@@ -22,61 +21,95 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<meta name="keywords" content="section links toolserver pietrodn" />
+		<meta name="keywords" content="section links wmflabs pietrodn" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" href="/favicon.ico" />
 
 		<title>Section Links - Wikimedia Tool Labs</title>
-		<link rel="stylesheet" type="text/css" href="pietrodn.css" />
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="../../dist/css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="pietrodn.css" rel="stylesheet">
 	</head>
 <body>
-	<div id="globalWrapper">
-		<div id="column-content">
-	<div id="content">
-		<a id="top"></a>
-		<h1 class="firstHeading">Section Links</h1>
-
-		<div id="bodyContent">
-			<h3 id="siteSub">Wikimedia Tool Labs - Pietrodn's tools.</h3>
+	<!-- Fixed navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="//tools.wmflabs.org/">WMF Tool Labs</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href=".">Section Links</a></li>
+            <li><a href="//github.com/pietrodn/section-links">Source (GitHub)</a></li>
+            <li><a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietrodn</a></li>
+            <li><a href="../intersect-contribs">Intersect Contribs</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+	
+	<div class="jumbotron">
+		<div class="container">
+			<div class="media">
+				<a class="pull-left" href="#">
+					<img class="media-object" src="images/WikitechLogo.png" alt="Wikitech Logo" style="padding:20px 20px 0 0;">
+				</a>
+				<div class="media-body">
+					<h1>Section Links<br />
+					<small>Wikimedia Tool Labs — Pietrodn's tools.</small>
+					</h1>
+				</div>
+			</div>
 			<!-- start content -->
 			<p>This tool shows inexistent section links from or to a page.</p>
-			<p>Known issues:
+			<p>Known issues</p>:
 			<ul>
 				<li>Highly experimental and not fully developed tool.</li>
 				<li>The tool uses the MediaWiki Web API and not the replicated databases in order to get revision full texts.</li>
 				<li><em>To</em> option is quite slow and expensive: it needs to retrieve the text of every reference to the given page (it frequently hits the API call limit).</li>
 				<li>Redirect handling is inconsistent.</li>
 			</ul>
-			</p>
-
-<form id="ListaForm" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
-<fieldset>
-<label id="wikiDb">Project:
-<select name="wikiDb">
-<?php
-	$selectedProject = (isset($_GET['wikiDb']) ? $_GET['wikiDb'] : NULL);
-    projectChooser($selectedProject);
-?>
-</select></label>
-<div style="float:left; margin-right:5px;">
-<?php
-$directions = Array('from'=>'From: ', 'to'=>'To: ');
-foreach($directions as $i=>$label)
-{
-    $selected='';
-    if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i)
-        $selected='checked ';
-    
-    echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
-}
-?>
-</div>
-<input type="text" size="20" name="wikiPage" value="<?php 
-if(isset($_GET['wikiPage']))
-	print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
-<br style="clear:both;" />
-</fieldset>
-<input id="SubmitButton" type="submit" value="Show" />
-</form>
+			
+			<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="get">
+				<div class="form-group">
+					<label for="wikiDb">Project</label>:
+					<select class="form-control" name="wikiDb" id="wikiDb">
+					<?php
+						/* Generates the project chooser dropdown */
+						$selectedProject = (isset($_GET['wikiDb']) ? $_GET['wikiDb'] : NULL);
+						projectChooser($selectedProject);
+					?>
+					</select>
+				</div>
+				<?php
+				$directions = Array('from'=>'From: ', 'to'=>'To: ');
+				foreach($directions as $i=>$label)
+				{
+					$selected='';
+					if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i)
+					$selected='checked ';
+					echo '<div class="radio">';
+					echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
+					echo '</div>';
+				}
+				?>
+				<div class="form-group">
+				<input class="form-control" type="text" size="20" name="wikiPage" value="<?php 
+					if(isset($_GET['wikiPage']))
+					print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
+				</div>
+				<input class="btn btn-default" id="SubmitButton" type="submit" value="Show" />
+			</form>
+		</div>
+	</div>
+	
+	<div class="container">
 
 <?php
     define('MAX_API_CALLS', 40);
@@ -249,62 +282,15 @@ if(isset($_GET['wikiPage']))
         return $pageText;
     }
 ?>
-			</div><!-- end content -->
-						<div class="visualClear"></div>
-
 	</div>
-		</div>
-		<div id="column-one">
-	<div id="p-cactions" class="portlet">
-		<h3>Visite</h3>
-		<div class="pBody">
-			<ul>
-	
-				 <li id="ca-nstab-project" class="selected"><a href="<?php echo $_SERVER['PHP_SELF']; ?>" title="The tool [t]" accesskey="t">tool</a></li>
-				 <li id="ca-source"><a href="//github.com/pietrodn/section-links" title="See the source code of this tool [s]" accesskey="s">source</a></li>
-			</ul>
+	<div id="footer">
+		<div class="container">
+			<p class="text-muted credit">
+			Made by <a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietro De Nicolao (Pietrodn)</a>.
+			Licensed under the
+			<a href="//www.gnu.org/licenses/gpl.html">GNU GPL</a> license.
+			</p>
 		</div>
 	</div>
-
-	<div class="portlet" id="p-logo">
-		<a style="background-image: url(images/WikitechLogo.png);" href="//wikitech.wikimedia.org" title="Wikimedia Tool Labs" accesskey="w"></a>
-	</div>
-		<div class='generated-sidebar portlet' id='p-navigation'>
-		<h3>Navigation</h3>
-		<div class='pBody'>
-			<ul>
-				<li id="n-pietrodn"><a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietrodn</a></li>
-				<li id="n-svn"><a href="//github.com/pietrodn/section-links">Git repository</a></li>
-			</ul>
-		</div>
-	</div>
-	
-	<div class='generated-sidebar portlet' id='p-tools'>
-
-		<h3>Tools</h3>
-		<div class='pBody'>
-			<ul>
-				<li id="t-intersectcontribs"><a href="/intersect-contribs">Intersect Contribs</a></li>
-				<li id="t-sectionlinks"><a href="/section-links">Section Links</a></li>
-			</ul>
-		</div>
-	</div>
-	
-		</div>
-			<div class="visualClear"></div>
-			<div id="footer">
-			<div id="f-copyrightico">
-<!-- Creative Commons License -->
-<a href="//www.gnu.org/licenses/gpl.html">
-<img alt="CC-GNU GPL 2.0" src="images/cc-GPL-a.png" height="50" /></a>
-<!-- /Creative Commons License -->
-</div>
-				<div id="f-poweredbyico"><a href="http://validator.w3.org/check?uri=referer"><img src="images/valid-xhtml10.png" alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a></div>
-			<ul id="f-list">
-				<li id="about"><a href="//wikitech.wikimedia.org/wiki/User:Pietrodn" title="User:Pietrodn">About Pietrodn</a></li>
-				<li id="email"><a href="mailto:pietrodn@toolserver.org" title="Mail">e-mail</a></li>
-			</ul>
-		</div>
-
-</div>
-</body></html>
+	</body>
+</html>

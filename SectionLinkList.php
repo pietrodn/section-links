@@ -29,8 +29,13 @@ class SectionLinkList
 	function printList()
 	{
 		if(count($this->arr)==0) {
-			echo "<p>No results.</p>";
+			echo '<div class="alert alert-info">';
+			echo 'No results found.';
+			echo '</div>';
 		} else {
+			echo '<div class="alert alert-success">';
+			echo count($this->arr) . ' results found.';
+			echo '</div>';	
 			echo '<ol>';
 			foreach($this->arr as $hash=>$row) {
 				$linkUrl = rawurlencode(str_replace(' ', '_', $row['to'] . '#' . $row['section']));
