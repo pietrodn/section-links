@@ -88,16 +88,17 @@
 					</select>
 				</div>
 				<?php
-				$directions = Array('from'=>'From: ', 'to'=>'To: ');
-				foreach($directions as $i=>$label)
-				{
-					$selected='';
-					if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i)
-					$selected='checked ';
-					echo '<div class="radio">';
-					echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
-					echo '</div>';
-				}
+					$directions = Array('from'=>'From: ', 'to'=>'To: ');
+					foreach($directions as $i=>$label)
+					{
+						$selected='';
+						if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i) {
+							$selected='checked ';
+						}
+						echo '<div class="radio">';
+						echo "<input type=\"radio\" name=\"wikiDirection\" value=\"$i\" $selected/> $label<br />";
+						echo '</div>';
+					}
 				?>
 				<div class="form-group">
 				<input class="form-control" type="text" size="20" name="wikiPage" value="<?php 
@@ -142,20 +143,17 @@
             
     	if($_GET['wikiDirection'] == 'from') {            
             preg_match_all('/\[\[([^\]|]*)#([^\]|]+)(\|[^\]]+)?\]\]/', $pageText, $linkedMatches, PREG_SET_ORDER);
-            foreach($linkedMatches as $linkedMatch)
-            {
+            foreach($linkedMatches as $linkedMatch) {
                 $linkedPage = $linkedMatch[1];
                 $linkedSect = str_replace('_', ' ', rawurldecode($linkedMatch[2]));
-                if($linkedPage == '')
-                {
+                if($linkedPage == '') {
                     $linkedPage = $_GET['wikiPage'];
                 }
                 
                 $flags = 0;
                 
                 $result = $ss->hasSection($linkedSect, $linkedPage);
-                if($result != SectionStore::SECTION_YES)
-                {
+                if($result != SectionStore::SECTION_YES) {
                 	if($result == SectionStore::RED_LINK) {
                 		$flags |= SectionLinkList::NOPAGE_LINK;
                     } else if($linkedPage == $_GET['wikiPage'] && hasAnchor($linkedSect, $pageText)) {
@@ -176,8 +174,7 @@
             $references = getReferences($_GET['wikiPage']);
             $references[] = array('title' => $_GET['wikiPage'], 'revisions' => array(0 => array('*' => $pageText))); // Adding the start page page as possible reference, as it's not included in backreferences.
 			
-            foreach($references as $row)
-            {
+            foreach($references as $row) {
                 $refPage = $row['title'];
                 $refText = $row['revisions'][0]['*'];
                 $pageForRegexp = preg_replace('/[ _]/', '[ _]', preg_quote($_GET['wikiPage'], '/'));
@@ -186,9 +183,7 @@
                     '#([^\]|]+)(\|[^\]]+)?\]\]/',
                     $refText, $refMatches, PREG_SET_ORDER);  
 				
-                foreach($refMatches as $refMatch)
-                {
-                	
+                foreach($refMatches as $refMatch) {
                     $flags = 0;
                     $refSect = str_replace('_', ' ', rawurldecode($refMatch[2]));
                     
@@ -212,9 +207,9 @@
         } else {
         	echo '<div class="alert alert-success">';
         	if($_GET['wikiDirection'] == 'from') {
-        		echo "Links to inexistent sections in the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
+        		echo "Links to inexistent sections in the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&amp;action=edit\">edit</a>):\n";
         	} else if($_GET['wikiDirection'] == 'to') {
-        		echo "Links to inexistent sections pointing to the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&action=edit\">edit</a>):\n";
+        		echo "Links to inexistent sections pointing to the specified <a href=\"//$wikiHost/wiki/$pageForUrl\">page</a> (<a href=\"//$wikiHost/w/index.php?title=$pageForUrl&amp;action=edit\">edit</a>):\n";
         	}
 			echo $count . ' results found.';
 			echo '</div>';	
