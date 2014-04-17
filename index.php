@@ -47,7 +47,7 @@
 			<li class="active"><a href=".">Section Links</a></li>
 			<li><a href="//github.com/pietrodn/section-links">Source (GitHub)</a></li>
 			<li><a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietrodn</a></li>
-			<li><a href="../intersect-contribs">Intersect Contribs</a></li>
+			<li><a href="../intersect-contribs/">Intersect Contribs</a></li>
 		  </ul>
 		</div><!--/.nav-collapse -->
 	  </div>
