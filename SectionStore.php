@@ -46,11 +46,13 @@ class SectionStore
 			$this->arr[$page] = FALSE;
 		}
 		
-		$sections = $unser['parse']['sections'];
-		//var_dump($sections);
 		$this->arr[$page] = Array();
-		foreach($sections as $s) {
-			$this->arr[$page][$s['index']] = $s['line'];
+		if(isset($unser['parse']['sections'])) {
+			$sections = $unser['parse']['sections'];
+		
+			foreach($sections as $s) {
+				$this->arr[$page][$s['index']] = $s['line'];
+			}
 		}
 	}
 };
