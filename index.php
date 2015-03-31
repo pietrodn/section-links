@@ -85,24 +85,24 @@
 						projectChooser($selectedProject);
 					?>
 					</select>
-				</div>
-				<?php
-					$directions = Array('from'=>'From: ', 'to'=>'To: ');
-					foreach($directions as $i=>$label)
-					{
-						$selected='';
-						if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i) {
-							$selected='checked ';
+				
+					<?php
+						$directions = Array('from'=>'From: ', 'to'=>'To: ');
+						foreach($directions as $i=>$label)
+						{
+							$selected='';
+							if(isset($_GET['wikiDirection']) && $_GET['wikiDirection']==$i) {
+								$selected='checked ';
+							}
+							echo '<div class="radio">';
+							echo "<label><input type=\"radio\" name=\"wikiDirection\" required value=\"$i\" $selected/> $label</label>";
+							echo '</div>';
 						}
-						echo '<div class="radio">';
-						echo "<input type=\"radio\" name=\"wikiDirection\" required value=\"$i\" $selected/> $label<br />";
-						echo '</div>';
-					}
-				?>
-				<div class="form-group">
-				<input class="form-control" type="text" placeholder="Page title" required name="wikiPage" value="<?php 
-					if(isset($_GET['wikiPage']))
-					print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
+					?>
+				
+					<input class="form-control" type="text" placeholder="Page title" required name="wikiPage" value="<?php 
+						if(isset($_GET['wikiPage']))
+						print htmlentities($_GET['wikiPage'], ENT_QUOTES, 'UTF-8'); ?>" />
 				</div>
 				<input class="btn btn-default" id="SubmitButton" type="submit" value="Show" />
 			</form>
