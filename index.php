@@ -231,11 +231,11 @@
 			throw new Exception('Max. API call limit exceeded (' . MAX_API_CALLS . ')', API_EXC);
 	
 		$pageForUrl = rawurlencode($page);
-		$url = "https://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&format=php";
+		$url = "https://$wikiHost/w/api.php?action=query&prop=revisions&generator=backlinks&gbltitle=$pageForUrl$queryContinue&rvprop=content&format=json";
 		$req = curl_init($url);
 		curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
 		$ser = curl_exec($req);
-		$unser = unserialize($ser);
+		$unser = json_decode($ser, TRUE);
 		$references = $unser['query']['pages'];
 		// Recursive function for query-continue
 		if(isset($unser['query-continue']))
@@ -275,10 +275,10 @@
 		if($followRedirects)
 			$redirects='&redirects'; 
 		$pageForUrl = rawurlencode($page);
-		$req = curl_init("https://$wikiHost/w/api.php?action=query&prop=revisions&titles=$pageForUrl&rvprop=content$redirects&format=php");
+		$req = curl_init("https://$wikiHost/w/api.php?action=query&prop=revisions&titles=$pageForUrl&rvprop=content$redirects&format=json");
 		curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
 		$ser = curl_exec($req);
-		$unser = unserialize($ser);
+		$unser = json_decode($ser, TRUE);
 		$singlePage = array_shift($unser['query']['pages']);
 		if(isset($singlePage['missing'])) {
 			return FALSE;

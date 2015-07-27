@@ -37,10 +37,10 @@ class SectionStore
 	{
 		/* Calls MW API */
 		$pageForUrl = rawurlencode($page);
-        $req = curl_init("https://" . $this->wikiHost . "/w/api.php?action=parse&prop=sections&page=$pageForUrl&format=php");
+        $req = curl_init("https://" . $this->wikiHost . "/w/api.php?action=parse&prop=sections&page=$pageForUrl&format=json");
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
         $ser = curl_exec($req);
-        $unser = unserialize($ser);
+        $unser = json_decode($ser, TRUE);
 		
 		if(isset($unser['error']) && $unser['error']['code'] == 'missingtitle') {
 			$this->arr[$page] = FALSE;
