@@ -237,10 +237,10 @@
 		$ser = curl_exec($req);
 		$unser = json_decode($ser, TRUE);
 		$references = $unser['query']['pages'];
-		// Recursive function for query-continue
-		if(isset($unser['query-continue']))
+		// Recursive function for continue
+		if(isset($unser['continue']))
 		{
-			$qc = '&gblcontinue=' . $unser['query-continue']['backlinks']['gblcontinue'];
+			$qc = '&' . http_build_query($unser['continue']);
 			return array_merge($references, getReferences($page, $qc));
 		} else {
 		
