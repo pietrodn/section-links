@@ -21,7 +21,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<meta name="keywords" content="section links wmflabs pietrodn" />
+		<meta name="keywords" content="section links toolforge pietrodn" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" href="/favicon.ico" />
 
@@ -40,7 +40,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		  </button>
-		  <a class="navbar-brand" href="//tools.wmflabs.org/">WMF Tool Labs</a>
+		  <a class="navbar-brand" href="//toolforge.org/">WMF Tool Labs</a>
 		</div>
 		<div class="navbar-collapse collapse">
 		  <ul class="nav navbar-nav">
@@ -292,7 +292,7 @@
 
 	<div id="footer">
 		<div class="container">
-			<a href="//tools.wmflabs.org/"><img id="footer-icon" src="//tools-static.wmflabs.org/static/logos/powered-by-tool-labs.png" title="Powered by Wikimedia Tool Labs" alt="Powered by Wikimedia Tool Labs" /></a>
+			<a href="//toolforge.org/"><img id="footer-icon" src="//tools-static.wmflabs.org/static/logos/powered-by-tool-labs.png" title="Powered by Wikimedia Tool Labs" alt="Powered by Wikimedia Tool Labs" /></a>
 			<p class="text-muted credit">
 			Made by <a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietro De Nicolao (Pietrodn)</a>.
 			Licensed under the

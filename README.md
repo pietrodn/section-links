@@ -7,8 +7,8 @@ See the [MediaWiki documentation](https://www.mediawiki.org/wiki/Help:Links) for
 
 ## Hosting
 
-The tool is currently hosted on [Wikimedia Tool Labs](https://tools.wmflabs.org/) at the following address:
-https://tools.wmflabs.org/section-links/
+The tool is currently hosted on [Wikimedia Tool Labs](https://toolforge.org/) at the following address:
+https://section-links.toolforge.org/
 
 It was previously hosted on [Wikimedia Toolserver](https://meta.wikimedia.org/wiki/Toolserver).
 
