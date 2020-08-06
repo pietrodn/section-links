@@ -61,7 +61,7 @@
 				</a>
 				<div class="media-body">
 					<h1>Section Links<br />
-					<small>Wikimedia Toolforgr — Pietrodn's tools.</small>
+					<small>Wikimedia Toolforge — Pietrodn's tools.</small>
 					</h1>
 				</div>
 			</div>
