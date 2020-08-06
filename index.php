@@ -61,7 +61,7 @@
 				</a>
 				<div class="media-body">
 					<h1>Section Links<br />
-					<small>Wikimedia Tool Labs — Pietrodn's tools.</small>
+					<small>Wikimedia Toolforgr — Pietrodn's tools.</small>
 					</h1>
 				</div>
 			</div>
@@ -292,7 +292,7 @@
 
 	<div id="footer">
 		<div class="container">
-			<a href="//toolforge.org/"><img id="footer-icon" src="//tools-static.wmflabs.org/static/logos/powered-by-tool-labs.png" title="Powered by Wikimedia Tool Labs" alt="Powered by Wikimedia Tool Labs" /></a>
+			<a href="//toolforge.org/"><img id="footer-icon" src="//tools-static.wmflabs.org/static/logos/powered-by-tool-labs.png" title="Powered by Wikimedia Toolforge" alt="Powered by Wikimedia Tool Labs" /></a>
 			<p class="text-muted credit">
 			Made by <a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietro De Nicolao (Pietrodn)</a>.
 			Licensed under the
