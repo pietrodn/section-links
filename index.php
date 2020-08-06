@@ -25,7 +25,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" href="/favicon.ico" />
 
-		<title>Section Links - Wikimedia Tool Labs</title>
+		<title>Section Links - Wikimedia Toolforge</title>
 		<link href="//tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
         <link href="pietrodn.css" rel="stylesheet">
 	</head>
@@ -40,7 +40,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		  </button>
-		  <a class="navbar-brand" href="//toolforge.org/">WMF Tool Labs</a>
+		  <a class="navbar-brand" href="//toolforge.org/">WMF Toolforge</a>
 		</div>
 		<div class="navbar-collapse collapse">
 		  <ul class="nav navbar-nav">
