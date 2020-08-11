@@ -25,7 +25,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="shortcut icon" href="/favicon.ico" />
 
-		<title>Section Links - Wikimedia Tool Labs</title>
+		<title>Section Links - Wikimedia Toolforge</title>
 		<link href="//tools-static.wmflabs.org/cdnjs/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
         <link href="pietrodn.css" rel="stylesheet">
 	</head>
@@ -40,7 +40,7 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		  </button>
-		  <a class="navbar-brand" href="//toolforge.org/">WMF Tool Labs</a>
+		  <a class="navbar-brand" href="//toolforge.org/">WMF Toolforge</a>
 		</div>
 		<div class="navbar-collapse collapse">
 		  <ul class="nav navbar-nav">
@@ -61,7 +61,7 @@
 				</a>
 				<div class="media-body">
 					<h1>Section Links<br />
-					<small>Wikimedia Tool Labs — Pietrodn's tools.</small>
+					<small>Wikimedia Toolforge — Pietrodn's tools.</small>
 					</h1>
 				</div>
 			</div>
@@ -292,7 +292,7 @@
 
 	<div id="footer">
 		<div class="container">
-			<a href="//toolforge.org/"><img id="footer-icon" src="//tools-static.wmflabs.org/static/logos/powered-by-tool-labs.png" title="Powered by Wikimedia Tool Labs" alt="Powered by Wikimedia Tool Labs" /></a>
+			<a href="//toolforge.org/"><img id="footer-icon" src="//tools-static.wmflabs.org/static/logos/powered-by-tool-labs.png" title="Powered by Wikimedia Toolforge" alt="Powered by Wikimedia Tool Labs" /></a>
 			<p class="text-muted credit">
 			Made by <a href="//wikitech.wikimedia.org/wiki/User:Pietrodn">Pietro De Nicolao (Pietrodn)</a>.
 			Licensed under the
